@@ -149,10 +149,10 @@ public class CashierScreen extends JFrame {
 		tableModelSale = new DefaultTableModel(new Object[][]{}, new String[]{"ID PRODUCT", "NAME PRODUCT", "PRICE", "QUANTITY", "IDCATEGORY"});
 		TableSalesList = new JTable(tableModelSale);
 		TableSalesList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-	        public void valueChanged(ListSelectionEvent e) {
-	            // Get the selected row index
-				 int selectedRow = TableSalesList.getSelectedRow();
+			 @Override
+			    public void valueChanged(ListSelectionEvent e) {
+			        // Get the selected row index
+			        int selectedRow = TableSalesList.getSelectedRow();
 			        // Check if a row is selected
 			        if (selectedRow != -1) {
 			            // Get data from the selected row
@@ -175,7 +175,7 @@ public class CashierScreen extends JFrame {
 			            Object nameitem = TableSalesList.getValueAt(selectedRow, 1);
 			            Object costinput = TableSalesList.getValueAt(selectedRow, 2);
 			            Object count = TableSalesList.getValueAt(selectedRow, 3);
-			            Object countofTableTotalSalesList = CashierItemDAO.getInstanitemDAO().getStockQuantityByProductID(idproductselect);
+			            Object countofTableTotalSalesList = CashierItemDAO.getStockQuantityByProductID(idproductselect);
 			            Object categoryId = TableSalesList.getValueAt(selectedRow, 4);
 
 			            // Display data in TextFields
@@ -195,9 +195,9 @@ public class CashierScreen extends JFrame {
 			                ex.printStackTrace();
 			                return;
 			            }
-	            }
-	        }
-	    });    
+			        }
+			    }
+			});
 		
 		JScrollPane scrollPaneTableSalesList = new JScrollPane(TableSalesList);
 		TableCustom.apply(scrollPaneTableSalesList,TableCustom.TableType.MULTI_LINE);
@@ -271,10 +271,7 @@ public class CashierScreen extends JFrame {
 		textFieldCountSellWarehouse.setBounds(698, 393, 126, 38);
 		panelSale.add(textFieldCountSellWarehouse);
 		textFieldCountSellWarehouse.setColumns(10);
-			
-		
-		
-		
+					
 		textFieldNameItemSell = new RoundJTextField(60);
 		textFieldNameItemSell.setFont(new Font("Tahoma", Font.BOLD, 16));
 		textFieldNameItemSell.setColumns(10);
@@ -318,9 +315,9 @@ public class CashierScreen extends JFrame {
                textFieldCountSellWarehouse.setText(String.valueOf(newCount));
                int countsellnew = Integer.parseInt(textFieldCountSellWarehouse.getText());
                 ProductCart item = new ProductCart(iditemsell, nameitemsell,costinputsell, countsell,idcategory);
-                CashierItemDAO.getInstanitemDAO().inserttablesell(item);
+                CashierItemDAO.inserttablesell(item);
                 Product itemud = new Product(iditemsell, nameitemsell, costinputsell, countsellnew, idcategory);
-                CashierItemDAO.getInstanitemDAO().update(itemud);  
+                CashierItemDAO.update(itemud);  
                     // Cập nhật bảng ngay tại đây
                 DefaultTableModel model = (DefaultTableModel) TableTotalSalesList.getModel();
                 int selectedRow = TableTotalSalesList.getSelectedRow();
@@ -373,7 +370,7 @@ public class CashierScreen extends JFrame {
                         if (Confirm==JOptionPane.YES_OPTION)
                         {    
                         	Product itemud = new Product(iditemsell, nameitemsell, costinputsell, countsellnew, idcategory);
-                        	CashierItemDAO.getInstanitemDAO().update(itemud); 
+                        	CashierItemDAO.update(itemud); 
                         // Cập nhật bảng ngay tại đây
                     DefaultTableModel model = (DefaultTableModel) TableTotalSalesList.getModel();
                     int selectedRow = TableTotalSalesList.getSelectedRow();
@@ -386,7 +383,7 @@ public class CashierScreen extends JFrame {
 
                     }                        
                     int itemid =Integer.valueOf(String.valueOf( TableSalesList.getValueAt(row,0)));                
-                    CashierItemDAO.getInstanitemDAO().deletesalecart(itemid); 
+                    CashierItemDAO.deletesalecart(itemid); 
                     tableModelSale.removeRow(row);                     
           }
                   }	                 
@@ -543,7 +540,7 @@ Timer timer = new Timer(1000, new ActionListener() {
         if (oneHourPassed) {
              // Thực hiện hành động khi đã qua một giờ
     System.out.println("Đã qua một giờ!");
-   int itemDAO = new CashierItemDAO().getInstanitemDAO().updateWorkHours(userName);
+   int itemDAO = new CashierItemDAO().updateWorkHours(userName);
    
 
     // Đặt lại biến oneHourPassed nếu cần
@@ -562,7 +559,7 @@ timer.start(); // Bắt đầu đếm thời gian khi khởi động ứng dụn
 	
 	public void TableDachSachTongSell() {
 		   tableModel = (DefaultTableModel) TableTotalSalesList.getModel();
-		    ArrayList<Product> AdminItemDAO = new CashierItemDAO().getInstanitemDAO().selectAll() ;
+		    ArrayList<Product> AdminItemDAO = new CashierItemDAO().selectAll() ;
 		    tableModel.getDataVector().removeAllElements();
 		    tableModel.setRowCount(0); // Clear existing data
 		    for(int i = 0; i < AdminItemDAO.size();i++) {
@@ -572,7 +569,9 @@ timer.start(); // Bắt đầu đếm thời gian khi khởi động ứng dụn
 		} 
 	
 	public void TableMua() {
-	    ArrayList<ProductCart> items = new CashierItemDAO().getInstanitemDAO().selectProductCart();
+		tableModelSale = (DefaultTableModel) TableSalesList.getModel();
+
+	    ArrayList<ProductCart> items = new CashierItemDAO().selectProductCart();
 	    tableModelSale.getDataVector().removeAllElements();
 	    tableModelSale.setRowCount(0); // Clear existing data
 	    for (int i = 0; i < items.size(); i++) {
@@ -581,7 +580,7 @@ timer.start(); // Bắt đầu đếm thời gian khi khởi động ứng dụn
 	}
 	
 	private void searchByName(String searchTerm) {
-	    ArrayList<Product> searchResults = CashierItemDAO.getInstanitemDAO().searchByName(searchTerm);
+	    ArrayList<Product> searchResults = CashierItemDAO.searchByName(searchTerm);
 	    tableModel.getDataVector().removeAllElements();
 	    tableModel.setRowCount(0);
 
