@@ -3,23 +3,24 @@ package dao;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import model.*;
 import util.HibernateUtil;
 
 public class CashierItemDAO {
 
-    public static CashierItemDAO getInstanitemDAO() {
-        return new CashierItemDAO();
-    }
-
-    public int inserttablesell(ProductCart t) {
+    public static int inserttablesell(ProductCart t) {
+        Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
             session.save(t);
-            session.getTransaction().commit();
+            transaction.commit();
             return 1;
         } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Cannot insert item, please check information.");
         }
@@ -49,30 +50,36 @@ public class CashierItemDAO {
         return result;
     }
 
-    public int getStockQuantityByProductID(int productID) {
-        int stockQuantity = 0;
+    public static int getStockQuantityByProductID(int productID) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<Integer> query = session.createQuery("SELECT StockQuantity FROM Product WHERE ProductID = :productId", Integer.class);
-            query.setParameter("productId", productID);
-            stockQuantity = query.uniqueResult();
+            Product product = session.get(Product.class, productID);
+            if (product != null) {
+                return product.getStockQuantity();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return stockQuantity;
+        return 0;
     }
 
     public ArrayList<ProductCart> selectProductCart() {
         ArrayList<ProductCart> result = new ArrayList<>();
+        Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<ProductCart> query = session.createQuery("FROM ProductCart", ProductCart.class);
-            result.addAll(query.list());
+            transaction = session.beginTransaction();
+            Query<ProductCart> query = session.createQuery("from ProductCart", ProductCart.class);
+            result = (ArrayList<ProductCart>) query.list();
+            transaction.commit();
         } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
         return result;
     }
 
-    public int deletesalecart(int ProductIDcart) {
+    public static int deletesalecart(int ProductIDcart) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             session.beginTransaction();
             Query query = session.createQuery("DELETE FROM ProductCart WHERE ProductIDcart = :productID");
@@ -86,7 +93,7 @@ public class CashierItemDAO {
         return 0;
     }
 
-    public ArrayList<Product> searchByName(String itemName) {
+    public static ArrayList<Product> searchByName(String itemName) {
         ArrayList<Product> result = new ArrayList<>();
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Query<Product> query = session.createQuery("FROM Product WHERE Name LIKE :itemName", Product.class);
@@ -98,7 +105,7 @@ public class CashierItemDAO {
         return result;
     }
 
-    public int update(Product t) {
+    public static int update(Product t) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             session.beginTransaction();
             session.update(t);
