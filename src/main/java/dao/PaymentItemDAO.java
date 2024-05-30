@@ -13,18 +13,20 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-import com.barcodelib.barcode.Linear;
-
-import view.Paymentscreen;
 import database.JDBCUtil;
+import model.BillItem;
 import model.ProductCart;
 import model.billModel;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import java.util.Properties;
+import javax.mail.*;
+import javax.mail.internet.*;
 public class PaymentItemDAO {
 
 	public static PaymentItemDAO getInstanitemDAO()
@@ -205,5 +207,57 @@ return result;
             e.printStackTrace();
         }
     }
-	
+    public billModel getBillById(int billId) {
+        billModel bill = null;
+        try {
+            Connection con = JDBCUtil.getConnection();
+            String sql = "SELECT * FROM bills WHERE BillID = ?";
+            try (PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setInt(1, billId);
+                ResultSet rs = pst.executeQuery();
+                if (rs.next()) {
+                    int id = rs.getInt("BillID");
+                    String saleDate = rs.getString("SaleDate");
+                    float totalAmount = rs.getFloat("TotalAmount");
+                    String customerName = rs.getString("CustomerName");
+                    String customerPhone = rs.getString("CustomerPhone");
+
+                    bill = new billModel(id, saleDate, totalAmount, customerName, customerPhone);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return bill;
+    }
+    public List<BillItem> getBillItemsByBillId(int billId) {
+        List<BillItem> billItems = new ArrayList<>();
+        try {
+            Connection con = JDBCUtil.getConnection();
+            String sql = "SELECT * FROM billitems WHERE BillID = ?";
+            try (PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setInt(1, billId);
+                ResultSet rs = pst.executeQuery();
+                while (rs.next()) {
+                    int billItemID = rs.getInt("BillItemID");
+                    int productID = rs.getInt("ProductID");
+                    int quantity = rs.getInt("Quantity");
+                    BigDecimal salePrice = rs.getBigDecimal("SalePrice");
+
+                    BillItem billItem = new BillItem();
+                    billItem.setBillItemID(billItemID);
+                    billItem.setProductID(productID);
+                    billItem.setQuantity(quantity);
+                    billItem.setSalePrice(salePrice);
+                    billItems.add(billItem);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return billItems;
+    }
+
+    
+   
 }
