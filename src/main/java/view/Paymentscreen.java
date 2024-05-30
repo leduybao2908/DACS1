@@ -13,6 +13,7 @@ import com.barcodelib.barcode.Linear;
 import dao.AdminItemDAO;
 import dao.PaymentItemDAO;
 import database.JDBCUtil;
+import model.BillItem;
 import model.ProductCart;
 import model.billModel;
 import net.glxn.qrgen.image.ImageType;
@@ -20,6 +21,13 @@ import supportview.RoundJTextField;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -35,6 +43,7 @@ import java.awt.event.WindowEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,24 +53,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.awt.Color;
 import java.awt.Desktop;
 
 public class Paymentscreen extends JFrame {
-
+	static final String from = "ble37588@gmail.com";
+    static final String password = "srrphqinahautkmo";
     public static final long serialVersionUID = 1L;
     public JPanel contentPane;
     public JTextField textFieldChange;
-    public JTextField textFieldCustomerMoney;
-    public AdminScreen AdminScreen;
+    public static JTextField textFieldCustomerMoney;
+    public view.AdminScreen AdminScreen;
     private DefaultTableModel tableModelBill;
     public JTable TableBillList;
-    private JTextField txtFieldCustomerName;
-    private JTextField textFieldCustomerPhone;
+    private static JTextField txtFieldCustomerName;
+    private static JTextField textFieldCustomerPhone;
     Image img = null;
+    private JTextField sendToEmailtf;
 
-    public Paymentscreen(AdminScreen AdminScreen) {
+    public Paymentscreen(view.AdminScreen AdminScreen) {
         this.AdminScreen = AdminScreen;
     }
 
@@ -134,8 +147,7 @@ public class Paymentscreen extends JFrame {
                 textFieldChange.setText(String.valueOf(costchange));
                 billModel bill = new billModel(BillId, timebill, totalprice, namecustomer, phonecustomer);
                 PaymentItemDAO.getInstanitemDAO().insert(bill);
-                PaymentItemDAO.getInstanitemDAO().deleteProductcart();
-                String FileLink = "C:\\Users\\LE DUY BAO\\Documents\\DACS-HOADON\\HOADON-";
+                String FileLink = "C:\\Users\\CHINH\\SQL\\FootballManager\\note-";
                 String filepath =  FileLink + NameFile;
                 PaymentItemDAO.getInstanitemDAO().writeToFile(filepath, timebill, BillId, namecustomer, phonecustomer, cost, totalprice, costchange);
                 PaymentItemDAO.getInstanitemDAO().openFileExplorer(filepath);
@@ -158,8 +170,6 @@ public class Paymentscreen extends JFrame {
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
-                SaleTable();
-                clearFields();
             }
         });
         contentPane.add(ButtonCalculateMoney);
@@ -174,7 +184,7 @@ public class Paymentscreen extends JFrame {
                 try {
                     int BillId = PaymentItemDAO.getInstanitemDAO().getBillCount();
                     String billIdStr = String.valueOf(BillId);
-                    String filepath = "C:\\Users\\LE DUY BAO\\Documents\\DACS-HOADON\\HOADON-" + billIdStr + ".txt";
+                    String filepath = "C:\\Users\\CHINH\\SQL\\FootballManager\\HOADON-" + billIdStr + ".txt";
                     File f = new File(filepath);
                     List<String> allText = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
                     String totaldata = String.join("", allText);
@@ -193,11 +203,17 @@ public class Paymentscreen extends JFrame {
         JButton ButtonSendBill = new supportview.ButtonGradient();
         ButtonSendBill.setText("Send bill to Email");
         ButtonSendBill.setFont(new Font("Tahoma", Font.BOLD, 16));
-        ButtonSendBill.setBounds(714, 259, 181, 43);
+        ButtonSendBill.setBounds(717, 259, 181, 43);
         ButtonSendBill.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
+        	   @Override
+        	    public void actionPerformed(ActionEvent e) {
+        		   
+                   int BillId = PaymentItemDAO.getInstanitemDAO().getBillCount();
+        		   String content = generateEmailContent(BillId);
+        		   sendEmail(sendToEmailtf.getText(),"Invoice Details",content);
+        		   
+        	        
+        	   }
         });
         contentPane.add(ButtonSendBill);
 
@@ -236,15 +252,29 @@ public class Paymentscreen extends JFrame {
 
         JLabel lblCustomerPhonenumber = new JLabel("CUSTOMER PHONENUMBER");
         lblCustomerPhonenumber.setFont(new Font("Tahoma", Font.BOLD, 16));
-        lblCustomerPhonenumber.setBounds(158, 260, 257, 40);
+        lblCustomerPhonenumber.setBounds(158, 331, 257, 40);
         lblCustomerPhonenumber.setForeground(Color.WHITE);
         contentPane.add(lblCustomerPhonenumber);
 
         textFieldCustomerPhone = new JTextField();
         textFieldCustomerPhone.setColumns(10);
-        textFieldCustomerPhone.setBounds(425, 263, 255, 40);
+        textFieldCustomerPhone.setBounds(425, 334, 255, 40);
         contentPane.add(textFieldCustomerPhone);
 
+       
+        sendToEmailtf = new JTextField();
+        sendToEmailtf.setText("nubibo123456789@gmail.com");
+        sendToEmailtf.setColumns(10);
+        sendToEmailtf.setBounds(425, 263, 255, 40);
+        contentPane.add(sendToEmailtf);
+       
+        
+        JLabel lblSendtoEmail = new JLabel("SEND TO EMAIL");
+        lblSendtoEmail.setForeground(Color.WHITE);
+        lblSendtoEmail.setFont(new Font("Tahoma", Font.BOLD, 16));
+        lblSendtoEmail.setBounds(158, 260, 257, 40);
+        contentPane.add(lblSendtoEmail); 
+        
         // Add the background label last
         JLabel lblNewLabel = new JLabel("");
         ImageIcon originalIcon = new ImageIcon(Paymentscreen.class.getResource("bgg.jpg"));
@@ -254,9 +284,11 @@ public class Paymentscreen extends JFrame {
         lblNewLabel.setIcon(scaledIcon);
         lblNewLabel.setBounds(0, 0, 1086, 713);
         contentPane.add(lblNewLabel);
-
+        
         // Set the background label to the lowest Z order
         contentPane.setComponentZOrder(lblNewLabel, contentPane.getComponentCount() - 1);
+        
+     
     }
 
     public void SaleTable() {
@@ -284,11 +316,114 @@ public class Paymentscreen extends JFrame {
     }
 
     public void openNewScreen() {
-        AdminScreen NewScreen = new AdminScreen();
+        view.AdminScreen NewScreen = new view.AdminScreen();
         NewScreen.setVisible(true);
         dispose();
     }
+    
+    public static boolean sendEmail(String to, String tieuDe, String noiDung) {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // Force TLS version if needed
+        props.put("mail.debug", "true"); // Enable debug output
 
+        Authenticator auth = new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(from, password);
+            }
+        };
+
+        Session session = Session.getInstance(props, auth);
+        session.setDebug(true); // Enable session debugging
+
+        MimeMessage msg = new MimeMessage(session);
+
+        try {
+            msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
+            msg.setFrom(new InternetAddress(from));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+            msg.setSubject(tieuDe);
+            msg.setSentDate(new Date());
+            msg.setContent(noiDung, "text/HTML; charset=UTF-8");
+
+            Transport.send(msg);
+            System.out.println("Gửi email thành công");
+            return true;
+        } catch (Exception e) {
+            System.out.println("Gặp lỗi trong quá trình gửi email");
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public static String generateEmailContent(int billId) {
+        float subtotal = 0.0f;
+        PaymentItemDAO dao = new PaymentItemDAO();
+        billModel bill = dao.getBillById(billId);
+        List<BillItem> billItems = dao.getBillItemsByBillId(billId);
+        ArrayList<ProductCart> items = new PaymentItemDAO().getInstanitemDAO().selectProductCart();
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div style='font-family: Arial, sans-serif; font-size: 14px; color: #333; background: #87CEFA; padding: 20px;'>");
+        sb.append("<div style='max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);'>");
+        sb.append("<h2>Hey ").append(bill.getCustomername()).append(",</h2>");
+        sb.append("<p style='font-size: 14px;'>This is the receipt for a payment of <strong>$").append(bill.getTotalcount()).append("</strong> (USD) you made to Spacial Themes.</p>");
+        sb.append("<div style='border-top: 1px solid #ddd; padding-top: 20px; margin-top: 20px;'>");
+        sb.append("<div style='display: flex; justify-content: space-between; gap: 100px;'>"); // Adjusted gap
+        sb.append("<div><div style='color: #888;'>Bill ID</div><strong>").append(bill.getIdbill()).append("</strong></div>");
+        sb.append("<div ><div style='color: #888;margin-left:170px'>Sale Date</div><strong style='margin-left:100px'>").append(bill.getSaledate()).append("</strong></div>");
+        sb.append("</div></div>");
+        sb.append("<div style='border-top: 1px solid #ddd; margin-top: 20px; padding-top: 20px;'>");
+        sb.append("<div style='display: flex; justify-content: center; align-items: center; gap: 100px;'>"); // Increased gap here
+        sb.append("<div style='text-align: center;'><div style='color: #888;'>Customer Name</div><strong>").append(bill.getCustomername()).append("</strong></div>");
+        sb.append("<div style='text-align: center;'><div style='color: #888;margin-left:100px'>Customer Phone</div><strong style='margin-left:100px'>").append(bill.getCustomerphone()).append("</strong></div>");
+        sb.append("</div></div>");
+
+        sb.append("<table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>");
+        sb.append("<thead><tr style='background: #f9f9f9;'>");
+        sb.append("<th style='padding: 10px; border: 1px solid #ddd;'>Product ID</th>");
+        sb.append("<th style='padding: 10px; border: 1px solid #ddd;'>Product Name</th>");
+        sb.append("<th style='padding: 10px; border: 1px solid #ddd;'>Price</th>");
+        sb.append("<th style='padding: 10px; border: 1px solid #ddd;'>Quantity</th>");
+        sb.append("<th style='padding: 10px; border: 1px solid #ddd;'>Category</th>");
+        sb.append("</tr></thead>");
+        sb.append("<tbody>");
+        
+        for (ProductCart cart : items) {
+            subtotal += cart.getPriceCart() * cart.getStockQuantityCart();
+            
+            sb.append("<tr>");
+            sb.append("<td style='padding: 10px; border: 1px solid #ddd;'>").append(cart.getProductIDcart()).append("</td>");
+            sb.append("<td style='padding: 10px; border: 1px solid #ddd;'>").append(cart.getNameSellCart()).append("</td>");
+            sb.append("<td style='padding: 10px; border: 1px solid #ddd;'>$").append(cart.getPriceCart()).append("</td>");
+            sb.append("<td style='padding: 10px; border: 1px solid #ddd;'>").append(cart.getStockQuantityCart()).append("</td>");
+            sb.append("<td style='padding: 10px; border: 1px solid #ddd;'>").append(cart.getCategoryIdCart()).append("</td>");
+            sb.append("</tr>");
+        }
+        
+        sb.append("</tbody>");
+        sb.append("</table>");
+        
+        float discount = 0.0f; // Calculate discount if applicable
+        float total = subtotal - discount;
+        
+        sb.append("<div style='margin-top: 20px;'>");
+        sb.append("<div style='display: flex; justify-content: flex-end;'><p style='margin: 0; color: #888;'>Subtotal:</p><span style='margin-left: 10px;'>$").append(String.format("%.2f", subtotal)).append("</span></div>");
+        sb.append("<div style='display: flex; justify-content: flex-end; margin-top: 10px;'><h5 style='margin: 0;'>Total:</h5><h5 style='margin-left: 10px; color: #28a745;'>$").append(String.format("%.2f", total)).append(" USD</h5></div>");
+        sb.append("</div>");
+        sb.append("</div><a href='#' style='display: block; text-align: center; background: #1e2e50; color: #fff; padding: 15px; text-decoration: none; border-radius: 5px; margin-top: 20px;'>Pay Now</a>");
+        sb.append("</div></div>");
+        
+        return sb.toString();
+    }
+
+
+
+
+    
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
