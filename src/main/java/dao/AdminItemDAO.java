@@ -300,6 +300,22 @@ public class AdminItemDAO {
         }
         return false;
     }
+    public boolean checkEmailExistence(String email) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Sử dụng HQL để kiểm tra sự tồn tại của email trong bảng Employee
+            Query<Long> query = session.createQuery("SELECT COUNT(*) FROM Employee WHERE gmail = :email", Long.class);
+            query.setParameter("email", email);
+            Long count = query.uniqueResult();
+            
+            // Nếu số lượng lớn hơn 0, email tồn tại
+            return count > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+ 
 
     public int getStockQuantityByProductID(int productID) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -331,5 +347,34 @@ public class AdminItemDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    public int updatePasswordByEmail(String email, String newPassword) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+
+            // Fetch the employee with the given email
+            Query<Employee> query = session.createQuery("from Employee where gmail = :email", Employee.class);
+            query.setParameter("email", email);
+            Employee employee = query.uniqueResult();
+
+            if (employee != null) {
+            	System.out.println("success");
+                // Update the password
+                employee.setPassword(newPassword);
+                session.update(employee);
+                transaction.commit();
+                return 1; // Success
+            } else {
+                return 0; // Employee not found
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+        return -1; // Error
     }
 }
