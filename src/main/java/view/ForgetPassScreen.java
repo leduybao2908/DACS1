@@ -111,7 +111,7 @@ public class ForgotPasswordScreen extends JFrame {
                     Verifybutton.setVisible(true);
                     String emnail = enterGmailtf.getText(); 
 
-                    Email.sendEmail(emnail, "Invoice Details", noiDung);
+                    Email.sendEmail(emnail, "OTP Verification", noiDung);
                     JOptionPane.showConfirmDialog(ForgotPasswordScreen.this, "Verify Email Success!", "Verify", JOptionPane.DEFAULT_OPTION);
                     
                 }
