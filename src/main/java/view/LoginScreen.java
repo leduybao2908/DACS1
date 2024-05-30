@@ -136,22 +136,13 @@ public class LoginScreen extends JFrame {
 		btnForgetPass.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {	
+				ForgotPasswordScreen  forgotPasswordScreen= new ForgotPasswordScreen();
+				forgotPasswordScreen.setVisible(true);
+				dispose();
 			}
         });
 
 		contentPane.add(btnForgetPass);
-	/*	
-		JLabel LabelUsername = new JLabel("USERNAME");
-		LabelUsername.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		
-		LabelUsername.setBounds(33, 166, 131, 53);
-		contentPane.add(LabelUsername);
-		
-		JLabel LabelPassword = new JLabel("PASSWORD");
-		LabelPassword.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		LabelPassword.setBounds(33, 233, 130, 53);
-		
-		contentPane.add(LabelPassword); */
 		
 		textFieldPassword = new PasswordFields();
 		textFieldPassword.setLabelText("password");
@@ -173,7 +164,7 @@ public class LoginScreen extends JFrame {
 		
 
 		JLabel lblNewLabel = new JLabel("");
-        ImageIcon originalIcon = new ImageIcon(Paymentscreen.class.getResource("bglogin.jpg"));
+        ImageIcon originalIcon = new ImageIcon(LoginScreen.class.getResource("bglogin.jpg"));
         Image originalImage = originalIcon.getImage();
         Image scaledImage = originalImage.getScaledInstance(473, 630, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
