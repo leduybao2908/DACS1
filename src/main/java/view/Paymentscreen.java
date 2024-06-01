@@ -147,7 +147,7 @@ public class Paymentscreen extends JFrame {
                 textFieldChange.setText(String.valueOf(costchange));
                 billModel bill = new billModel(BillId, timebill, totalprice, namecustomer, phonecustomer);
                 PaymentItemDAO.getInstanitemDAO().insert(bill);
-                String FileLink = "C:\\Users\\CHINH\\SQL\\FootballManager\\note-";
+                String FileLink = "C:\\Users\\LE DUY BAO\\Documents\\DACS-HOADON";
                 String filepath =  FileLink + NameFile;
                 PaymentItemDAO.getInstanitemDAO().writeToFile(filepath, timebill, BillId, namecustomer, phonecustomer, cost, totalprice, costchange);
                 PaymentItemDAO.getInstanitemDAO().openFileExplorer(filepath);
@@ -184,7 +184,7 @@ public class Paymentscreen extends JFrame {
                 try {
                     int BillId = PaymentItemDAO.getInstanitemDAO().getBillCount();
                     String billIdStr = String.valueOf(BillId);
-                    String filepath = "C:\\Users\\CHINH\\SQL\\FootballManager\\HOADON-" + billIdStr + ".txt";
+                    String filepath = "C:\\Users\\LE DUY BAO\\Documents\\DACS-HOADON" + billIdStr + ".txt";
                     File f = new File(filepath);
                     List<String> allText = Files.readAllLines(f.toPath(), StandardCharsets.UTF_8);
                     String totaldata = String.join("", allText);
@@ -211,8 +211,11 @@ public class Paymentscreen extends JFrame {
                    int BillId = PaymentItemDAO.getInstanitemDAO().getBillCount();
         		   String content = generateEmailContent(BillId);
         		   sendEmail(sendToEmailtf.getText(),"Invoice Details",content);
-        		   
-        	        
+        		   SaleTable();
+        		   PaymentItemDAO dao = new PaymentItemDAO();
+        		   dao.deleteProductcart();
+        		   SaleTable();
+        	      clearFields(); 
         	   }
         });
         contentPane.add(ButtonSendBill);
@@ -263,7 +266,7 @@ public class Paymentscreen extends JFrame {
 
        
         sendToEmailtf = new JTextField();
-        sendToEmailtf.setText("nubibo123456789@gmail.com");
+        sendToEmailtf.setText("");
         sendToEmailtf.setColumns(10);
         sendToEmailtf.setBounds(425, 263, 255, 40);
         contentPane.add(sendToEmailtf);
