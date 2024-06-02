@@ -409,16 +409,16 @@ public class CashierScreen extends JFrame {
 		btnFind.setBounds(536, 26, 135, 43);
 		panelSale.add(btnFind);
 		
-		ButtonGradient ButtonBuy = new supportview.ButtonGradient();
-		ButtonBuy.setText("BUY");
+		ButtonGradient ButtonSell = new supportview.ButtonGradient();
+		ButtonSell.setText("SELL");
 
-		ButtonBuy.setHorizontalAlignment(SwingConstants.LEFT);
-		ButtonBuy.setBounds(524, 624, 126, 38);
-		ButtonBuy.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(CashierScreen.class.getResource("cash-icon.png"))));
-		ButtonBuy.setFont(new Font("Tahoma", Font.BOLD, 16));
-		panelSale.add(ButtonBuy);
+		ButtonSell.setHorizontalAlignment(SwingConstants.LEFT);
+		ButtonSell.setBounds(524, 624, 126, 38);
+		ButtonSell.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(CashierScreen.class.getResource("cash-icon.png"))));
+		ButtonSell.setFont(new Font("Tahoma", Font.BOLD, 16));
+		panelSale.add(ButtonSell);
 		
-		ButtonBuy.addActionListener(new ActionListener() {
+		ButtonSell.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
 	             
 	            	openpaymentscreenn();
