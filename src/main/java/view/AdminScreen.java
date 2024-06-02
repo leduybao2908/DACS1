@@ -1,5 +1,5 @@
 package view;
-import chartjava.*;  
+import chartjava.*;   
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
@@ -273,14 +273,14 @@ public class AdminScreen extends JFrame {
 		LabelTongTienSell.setFont(new Font("Tahoma", Font.BOLD, 16));
 		panelSale.add(LabelTongTienSell);
 		
-		JButton ButtonBuy = new supportview.ButtonGradient();
-		ButtonBuy.setText("BUY");
-		ButtonBuy.setHorizontalAlignment(SwingConstants.LEFT);
-		ButtonBuy.setBounds(524, 624, 126, 38);
-		ButtonBuy.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(AdminScreen.class.getResource("cash-icon.png"))));
+		JButton ButtonSell = new supportview.ButtonGradient();
+		ButtonSell.setText("SELL");
+		ButtonSell.setHorizontalAlignment(SwingConstants.LEFT);
+		ButtonSell.setBounds(524, 624, 126, 38);
+		ButtonSell.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().createImage(AdminScreen.class.getResource("cash-icon.png"))));
 
-		ButtonBuy.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panelSale.add(ButtonBuy);
+		ButtonSell.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		panelSale.add(ButtonSell);
 		
 		TextTotalCart = new JTextField();
 		TextTotalCart.setBounds(224, 623, 237, 40);
@@ -482,7 +482,7 @@ public class AdminScreen extends JFrame {
         });
 		
 		
-		ButtonBuy.addActionListener(new ActionListener() {
+		ButtonSell.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
 	           
 	            	openpaymentscreenn();
